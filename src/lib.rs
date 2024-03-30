@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::error::Error;
 use urlencoding::encode;
 use std::io::Write;
-
+use std::fs::File;
 
 #[no_mangle]
 pub fn translate(
