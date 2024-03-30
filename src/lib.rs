@@ -1,45 +1,25 @@
 use serde_json::Value;
 use std::collections::HashMap;
 use std::error::Error;
-use std::fs;
-use std::io::{self, Write};
-use std::path::Path;
-use std::thread;
-use std::time::Duration;
+use urlencoding::encode;
 
 #[no_mangle]
 pub fn translate(
     text: &str, // 待翻译文本
     from: &str, // 源语言
     to: &str,   // 目标语言
+    // (pot会根据info.json 中的 language 字段传入插件需要的语言代码，无需再次转换)
     detect: &str, // 检测到的语言 (若使用 detect, 需要手动转换)
     needs: HashMap<String, String>, // 插件需要的其他参数,由info.json定义
-) -> Result<Value, Box<dyn Error>> {
-    let folder_path = Path::new(r"C:\Users\yy\ollama\t5_translate");
-    let text_path = folder_path.join("text.txt");
-    let zh_path = folder_path.join("zh.txt");
+) -> Result<(String, Value), Box<dyn Error>> {
+    // 将待翻译文本返回作为结果的一部分
+    let translated_text = text.to_string();
 
-    let mut file = fs::File::create(text_path)?;
-    file.write_all(text.as_bytes())?;
-    drop(file);
-
-    loop {
-        if zh_path.exists() {
-            let zh_text = fs::read_to_string(zh_path.clone())?;
-            return Ok(Value::String(zh_text));
-        }
-        thread::sleep(Duration::from_millis(200));
+    if let Some(result) = parse_result(res) {
+        // 返回待翻译文本和翻译结果的元组
+        return Ok((translated_text, Value::String(result)));
+    } else {
+        return Err("Response Parse Error".into());
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn try_request() {
-        let mut needs = HashMap::new();
-        needs.insert("requestPath".to_string(), "lingva.pot-app.com".to_string());
-        let result = translate("你好 世界！", "auto", "en", "zh_cn", needs).unwrap();
-        println!("{result}");
-    }
-}
