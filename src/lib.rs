@@ -16,9 +16,9 @@ pub fn translate(
 ) -> Result<Value, Box<dyn Error>> {
      let file_path = match needs.get("path") {
         Some(path) => path.to_string(),
-        None => return Err("Missing file path".into()),
+        None => return Err("文件夹错误".into()),
     };
-    
+
     let mut file = File::create(file_path)?;
     file.write_all(text.as_bytes())?;
     
