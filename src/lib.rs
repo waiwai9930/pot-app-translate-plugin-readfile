@@ -12,8 +12,6 @@ pub fn translate(
     needs: HashMap<String, String>, // 插件需要的其他配置信息,由info.json定义
 ) -> Result<(String, serde_json::Value), Box<dyn Error>> {
     // 将待翻译文本返回作为结果的一部分
-    let translated_text = text.to_string();
-
-    // 返回待翻译文本作为翻译结果
-    Ok((translated_text, serde_json::Value::String(text.to_string())))
+    // 返回用Value包裹的String
+    return Ok(Value::String(text.to_string()));
 }
