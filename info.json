@@ -1,10 +1,10 @@
 {
-  "id": "[plugin].com.pot-app.lingva",
+  "id": "[plugin].com.pot-app.txt",
   "plugin_type": "translate",
   "icon": "lingva.svg",
   "display": "Lingva",
   "homepage": "https://github.com/pot-app/pot-app-translate-plugin-template",
-  "needs": [{ "key": "requestPath", "display": "请求地址" }],
+  "needs": [{ "path": "requestPath", "display": "文件夹位置" }],
   "language": {
     "auto": "auto",
     "zh_cn": "zh",
