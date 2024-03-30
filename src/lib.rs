@@ -13,5 +13,5 @@ pub fn translate(
 ) -> Result<(String, serde_json::Value), Box<dyn Error>> {
     // 将待翻译文本返回作为结果的一部分
     // 返回用Value包裹的String
-    return Ok((Value::String(text.to_string())));
+    return Ok((text.to_string(), Value::String(text.to_string())));
 }
