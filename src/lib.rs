@@ -12,5 +12,13 @@ pub fn translate(
     detect: &str, // 检测到的语言 (若使用 detect, 需要手动转换)
     needs: HashMap<String, String>, // 插件需要的其他参数,由info.json定义
 ) -> Result<Value, Box<dyn Error>> {
+     let file_path = match needs.get("path") {
+        Some(path) => path.to_string(),
+        None => return Err("Missing file path".into()),
+    };
+    
+    let mut file = File::create(file_path)?;
+    file.write_all(text.as_bytes())?;
+    
     Ok(Value::String(text.to_string()))
 }
