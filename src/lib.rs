@@ -25,8 +25,7 @@ pub fn translate(
 
     loop {
         if zh_path.exists() {
-            let zh_text = fs::read_to_string(zh_path)?;
-            fs::remove_file(zh_path)?;
+            let zh_text = fs::read_to_string(zh_path.clone())?;
             return Ok(Value::String(zh_text));
         }
         thread::sleep(Duration::from_millis(200));
