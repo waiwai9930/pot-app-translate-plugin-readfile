@@ -1,47 +1,35 @@
 use serde_json::Value;
 use std::collections::HashMap;
 use std::error::Error;
-use urlencoding::encode;
+use std::fs;
+use std::io::{self, Write};
+use std::path::Path;
+use std::thread;
+use std::time::Duration;
 
 #[no_mangle]
 pub fn translate(
     text: &str, // 待翻译文本
     from: &str, // 源语言
     to: &str,   // 目标语言
-    // (pot会根据info.json 中的 language 字段传入插件需要的语言代码，无需再次转换)
     detect: &str, // 检测到的语言 (若使用 detect, 需要手动转换)
     needs: HashMap<String, String>, // 插件需要的其他参数,由info.json定义
 ) -> Result<Value, Box<dyn Error>> {
-    let client = reqwest::blocking::ClientBuilder::new().build()?;
+    let folder_path = Path::new(r"C:\Users\yy\ollama\t5_translate");
+    let text_path = folder_path.join("text.txt");
+    let zh_path = folder_path.join("zh.txt");
 
-    let mut url = match needs.get("requestPath") {
-        Some(url) => url.to_string(),
-        None => "lingva.pot-app.com".to_string(),
-    };
-    if url.is_empty() {
-        url = "lingva.pot-app.com".to_string();
-    }
-    if !url.starts_with("http") {
-        url = format!("https://{}", url);
-    }
+    let mut file = fs::File::create(text_path)?;
+    file.write_all(text.as_bytes())?;
+    drop(file);
 
-    let plain_text = text.replace("/", "@@");
-    let encode_text = encode(plain_text.as_str());
-
-    let res: Value = client
-        .get(format!("{url}/api/v1/{from}/{to}/{encode_text}"))
-        .send()?
-        .json()?;
-
-    fn parse_result(res: Value) -> Option<String> {
-        let result = res.as_object()?.get("translation")?.as_str()?.to_string();
-
-        Some(result.replace("@@", "/"))
-    }
-    if let Some(result) = parse_result(res) {
-        return Ok(Value::String(result));
-    } else {
-        return Err("Response Parse Error".into());
+    loop {
+        if zh_path.exists() {
+            let zh_text = fs::read_to_string(zh_path)?;
+            fs::remove_file(zh_path)?;
+            return Ok(Value::String(zh_text));
+        }
+        thread::sleep(Duration::from_millis(200));
     }
 }
 
