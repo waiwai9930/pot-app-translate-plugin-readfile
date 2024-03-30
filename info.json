@@ -4,7 +4,7 @@
   "icon": "lingva.svg",
   "display": "File_read",
   "homepage": "https://github.com/pot-app/pot-app-translate-plugin-template",
-  "needs": [{ "file_path": "path", "display": "文件夹位置" }],
+  "needs": [{ "path": "path", "display": "文件夹位置" }],
   "language": {
     "auto": "auto",
     "zh_cn": "zh",
