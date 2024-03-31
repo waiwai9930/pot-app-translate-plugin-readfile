@@ -17,7 +17,8 @@ pub fn translate(
     to: &str,   // 目标语言
     // (pot会根据info.json 中的 language 字段传入插件需要的语言代码，无需再次转换)
     detect: &str, // 检测到的语言 (若使用 detect, 需要手动转换)
-    needs: HashMap<String, String>, // 插件需要的其他参数,由info.json定义
+    needs: HashMap<String, String>, // 插件需要的其他参数,由info.json定义\
+     max_loops: usize, // 循环的最大次数
 ) -> Result<Value, Box<dyn Error>> {
 
      // 读入翻译后中文zh.txt
@@ -43,6 +44,7 @@ pub fn translate(
    
     
     // 检测文本、读取文本、清除文本
+    let mut content = String::new();
     let mut loops = 150; // 计数器变量
     loop {
         if std::path::Path::new(&path_zh).exists() {
@@ -55,6 +57,6 @@ pub fn translate(
             return Err("超过最大循环次数".into());
         }
     }
-    
+
     Ok(Value::String(content))
 }
