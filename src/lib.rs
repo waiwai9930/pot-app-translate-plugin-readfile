@@ -6,9 +6,9 @@ use std::io::Write;
 use std::fs::File;
 use std::fs::read_to_string;
 use std::fs::remove_file;
-use std::thread::sleep;
+use tokio::time::timeout;
+use tokio::time::sleep;
 use core::time::Duration;
-
 
 #[no_mangle]
 pub fn translate(
@@ -41,17 +41,29 @@ pub fn translate(
     file.write_all(text.as_bytes())?;
     
    
-    
-    // 检测文本、读取文本、清除文本
-    let mut content = String::new();
-    loop {
-        if std::path::Path::new(&path_zh).exists() {
-            content = read_to_string(&path_zh)?;
-            break;
-        }
-        sleep(Duration::from_millis(100));
-    }
+      // 设置超时时间为15秒
+    let timeout_duration = Duration::from_secs(10);
 
-    
-    Ok(Value::String(content))
+    // 使用tokio的timeout函数来设置超时
+    let result = timeout(timeout_duration, async {
+        loop {
+            if Path::new(&file_path).exists() {
+                break;
+            }
+            sleep(Duration::from_millis(100)).await;
+        }
+        read_to_string(&file_path)
+    })
+    .await;
+
+    match result {
+        Ok(content) => {
+            // 成功读取文本的处理逻辑
+            Ok(Value::String(content))
+        }
+        Err(_) => {
+            // 超时处理逻辑
+            Err("读取text文件超时".into())
+        }
+    }
 }
