@@ -14,13 +14,27 @@ pub fn translate(
     detect: &str, // 检测到的语言 (若使用 detect, 需要手动转换)
     needs: HashMap<String, String>, // 插件需要的其他参数,由info.json定义
 ) -> Result<Value, Box<dyn Error>> {
-     let file_path = match needs.get("path") {
+     let file_path = match needs.get("path_text") {
         Some(path) => path.to_string(),
-        None => return Err("文件路径错误".into()),
+        None => return Err("写出text文件错误".into()),
     };
 
     let mut file = File::create(file_path)?;
     file.write_all(text.as_bytes())?;
-    
-    Ok(Value::String(text.to_string()))
+     let path_zh = match needs.get("path_zh") {
+        Some(path) => path.to_string(),
+        None => return Err("读取zh文件错误".into()),
+    };
+
+    let mut content = String::new();
+    loop {
+        if std::path::Path::new(&path_zh).exists() {
+            content = read_to_string(&path_zh)?;
+            remove_file(&path_zh)?;
+            break;
+        }
+        sleep(Duration::from_millis(100));
+    }
+
+    Ok(Value::String(content))
 }
