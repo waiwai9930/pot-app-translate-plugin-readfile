@@ -4,6 +4,11 @@ use std::error::Error;
 use urlencoding::encode;
 use std::io::Write;
 use std::fs::File;
+use std::fs::read_to_string;
+use std::fs::remove_file;
+use std::thread::sleep;
+use core::time::Duration;
+
 
 #[no_mangle]
 pub fn translate(
