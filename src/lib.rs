@@ -51,7 +51,7 @@ pub fn translate(
         }
         sleep(Duration::from_millis(100));
     }
-    remove_file(&path_zh)?;
+
     
     Ok(Value::String(content))
 }
