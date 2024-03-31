@@ -19,18 +19,30 @@ pub fn translate(
     detect: &str, // 检测到的语言 (若使用 detect, 需要手动转换)
     needs: HashMap<String, String>, // 插件需要的其他参数,由info.json定义
 ) -> Result<Value, Box<dyn Error>> {
-     let file_path = match needs.get("path_text") {
-        Some(path) => path.to_string(),
-        None => return Err("写出text文件错误".into()),
-    };
 
-    let mut file = File::create(file_path)?;
-    file.write_all(text.as_bytes())?;
+     // 读入翻译后中文zh.txt
      let path_zh = match needs.get("path_zh") {
         Some(path) => path.to_string(),
         None => return Err("读取zh文件错误".into()),
     };
+    // 清除残留文本
+    if std::path::Path::new(&path_zh).exists() {
+        remove_file(&path_zh)?;
+    }
 
+
+    // 写出英语文本到text.txt
+     let file_path = match needs.get("path_text") {
+        Some(path) => path.to_string(),
+        None => return Err("写出text文件错误".into()),
+    };
+    // 写出操作
+    let mut file = File::create(file_path)?;
+    file.write_all(text.as_bytes())?;
+    
+   
+    
+    // 检测文本、读取文本、清除文本
     let mut content = String::new();
     loop {
         if std::path::Path::new(&path_zh).exists() {
