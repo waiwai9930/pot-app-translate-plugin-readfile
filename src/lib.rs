@@ -47,11 +47,11 @@ pub fn translate(
     loop {
         if std::path::Path::new(&path_zh).exists() {
             content = read_to_string(&path_zh)?;
-            remove_file(&path_zh)?;
             break;
         }
         sleep(Duration::from_millis(100));
     }
-
+    remove_file(&path_zh)?;
+    
     Ok(Value::String(content))
 }
